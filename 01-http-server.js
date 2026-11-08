@@ -60,9 +60,80 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { "Content-Type": "text/plain" });
                 res.end("User list\n");
             }
+            else if (req.method === "POST") {
+                // Store request body chunks
+                const bodyChunks = [];
+
+                // Count data events
+                let chunkCount = 0;
+
+                // Receive request body
+                req.on("data", (chunk) => {
+                    chunkCount++;
+
+                    console.log("Received chunk:", chunk);
+                    console.log("Is Buffer:", Buffer.isBuffer(chunk));
+
+                    bodyChunks.push(chunk);
+                });
+
+                // Process request body after receiving all data
+                req.on("end", () => {
+                    console.log("Total data events:", chunkCount);
+
+                    // // Combine all chunks into one Buffer
+                    // const bodyBuffer = Buffer.concat(bodyChunks);
+
+                    // // Convert Buffer to String
+                    // const bodyText = bodyBuffer.toString();
+
+                    // console.log("Raw request body:", bodyText);
+                    const rawBody = Buffer.concat(bodyChunks).toString();
+                    console.log("Raw body", rawBody);
+
+                    try {
+                        // Parse JSON string into JavaScript object
+                        const parsedBody = JSON.parse(rawBody);
+
+                        // Store parsed data in req.body
+                        req.body = parsedBody;
+
+                        console.log("Parsed request body:");
+                        console.log(req.body);
+
+                        res.writeHead(200, {
+                            "Content-Type": "text/plain"
+                        });
+                        res.end("JSON received\n");
+                    }
+                    catch (error) {
+                        console.log("JSON parsing failed:", error.message);
+
+                        res.writeHead(400, {
+                            "Content-Type": "text/plain"
+                        });
+                        res.end("Invalid JSON\n");
+                    }
+                });
+
+            }
             else {
                 res.writeHead(404, { "Content-Type": "text/plain" });
                 res.end("Not Found\n");
+                // req.on("data", (chunk) => {
+                //     bodyChunks.push(chunk);
+                // });
+                // req.on("end", () => {
+                //     // Process the complete request body
+                //     const requestBody = Buffer.concat(bodyChunks).toString();
+                //     const bodyBuffer = Buffer.concat(bodyChunks);
+                //     const bodyText = bodyBuffer.toString();
+                //     const parsedBody = JSON.parse(bodyText);
+                // });
+                // req.body = parsedBody;
+
+                // console.log("Parsed request body:");
+                // console.log(req.body);
             }
             break;
         // Unknown endpoint
