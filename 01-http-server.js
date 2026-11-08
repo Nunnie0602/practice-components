@@ -31,8 +31,46 @@ const server = http.createServer((req, res) => {
 
     // Same url with diff method
     const url = new URL(req.url, `http://${req.headers.host}`);
-    if 
-    
+    switch (url.pathname) {
+        //Home endpoint
+        case "/":
+            if (req.method === "GET") {
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end("Hello Node.js\n");
+            }
+            else {
+                res.writeHead(404, { "Content-Type": "text/plain" });
+                res.end("Not Found\n");
+            }
+            break;
+        //Health endpoint
+        case "/health":
+            if (req.method === "GET") {
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end("Server is healthy\n");
+            }
+            else {
+                res.writeHead(404, { "Content-Type": "text/plain" });
+                res.end("Not Found\n");
+            }
+            break;
+        //Users endpoint
+        case "/users":
+            if (req.method === "GET") {
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end("User list\n");
+            }
+            else {
+                res.writeHead(404, { "Content-Type": "text/plain" });
+                res.end("Not Found\n");
+            }
+            break;
+        // Unknown endpoint
+        default:
+            res.writeHead(404, { "Content-Type": "text/plain" });
+            res.end("Not Found\n");
+            break;
+    }
 });
 
 
